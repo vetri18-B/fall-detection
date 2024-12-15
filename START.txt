@@ -1,0 +1,41 @@
+START
+INITIALIZE monitoring system, set monitoring interval to 5-7 seconds
+
+WHILE monitoring system is active:
+    WAIT for interval duration (5-7 seconds)
+    
+    // Step 1: Collect Vitals and IMU Data
+    READ latest heart rate (HR), SpO₂, body temperature, and IMU sensor data
+    
+    // Step 2: Check Vitals Against Thresholds
+    SET isVitalsOutOfThreshold = FALSE
+    
+    IF (HR < 60 OR HR > 140):
+        SET isVitalsOutOfThreshold = TRUE
+    IF (SpO₂ < 90):
+        SET isVitalsOutOfThreshold = TRUE
+    IF (temperature < 35 OR temperature > 39):
+        SET isVitalsOutOfThreshold = TRUE
+        
+    // Step 3: Trigger Model Based on Vitals Status
+    IF isVitalsOutOfThreshold == TRUE:
+        RUN fall prediction model with IMU and vitals data
+        SET prediction_result = output of fall prediction model
+        
+        IF prediction_result == "Risk":
+            // Step 4: Initiate Alerts and Warnings
+            SEND alert to caregiver with current vitals and IMU data
+            ACTIVATE vibration alert on walking stick
+            DISPLAY message: "Health condition unstable; fall risk detected" to elderly user
+            
+        ELSE:
+            // Normal prediction result; reset to monitoring
+            CONTINUE to next interval
+            
+    ELSE:
+        // Vitals are within normal range; continue to next monitoring interval
+        CONTINUE to next interval
+
+END WHILE
+
+END
